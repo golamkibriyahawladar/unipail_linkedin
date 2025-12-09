@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,7 +15,6 @@
             min-height: 100vh;
             margin: 0;
         }
-
         .container {
             background-color: #ffffff;
             padding: 40px;
@@ -25,18 +23,14 @@
             max-width: 450px;
             text-align: center;
         }
-
         h2 {
-            color: #0077b5;
-            /* LinkedIn Blue */
+            color: #0077b5; /* LinkedIn Blue */
             margin-bottom: 20px;
         }
-
         p {
             line-height: 1.6;
             margin-bottom: 25px;
         }
-
         #connectButton {
             background-color: #0077b5;
             color: white;
@@ -49,11 +43,13 @@
             transition: background-color 0.3s ease;
             width: 100%;
         }
-
         #connectButton:hover {
             background-color: #005582;
         }
-
+        #connectButton:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
         .instruction {
             margin-top: 20px;
             font-size: 0.9em;
@@ -61,43 +57,91 @@
             border-top: 1px solid #eee;
             padding-top: 15px;
         }
+        .loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0077b5;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
-
 <body>
 
-    <div class="container">
-        <h2>🤖 আপনার LinkedIn অ্যাকাউন্ট কানেক্ট করুন</h2>
-        <p>
-            আপনার অ্যাকাউন্টে আমাদের AI Chatbot যুক্ত করতে, দয়া করে আপনার LinkedIn অ্যাকাউন্টে লগইন করুন। এটি সম্পূর্ণ
-            সুরক্ষিতভাবে Unipile এর মাধ্যমে হবে।
-        </p>
+<div class="container">
+    <h2>🤖 আপনার LinkedIn অ্যাকাউন্ট কানেক্ট করুন</h2>
+    <p>
+        আপনার অ্যাকাউন্টে আমাদের AI Chatbot যুক্ত করতে, দয়া করে আপনার LinkedIn অ্যাকাউন্টে লগইন করুন। এটি সম্পূর্ণ সুরক্ষিতভাবে Unipile এর মাধ্যমে হবে।
+    </p>
 
-        <button id="connectButton" onclick="startConnection()">
-            LinkedIn দিয়ে কানেক্ট করুন
-        </button>
+    <button id="connectButton" onclick="startConnection()">
+        <span id="buttonText">LinkedIn দিয়ে কানেক্ট করুন</span>
+        <div id="loader" class="loader"></div>
+    </button>
 
-        <div class="instruction">
-            <p>সফলভাবে কানেক্ট হওয়ার পরে, আপনাকে স্বয়ংক্রিয়ভাবে LinkedIn-এ ফিরিয়ে আনা হবে।</p>
-        </div>
+    <div class="instruction">
+        <p>সফলভাবে কানেক্ট হওয়ার পরে, আপনাকে স্বয়ংক্রিয়ভাবে LinkedIn-এ ফিরিয়ে আনা হবে</p>
     </div>
+</div>
 
-    <script>
-        // **গুরুত্বপূর্ণ:** আপনার Unipile Hosted Authentication URL এখানে প্রতিস্থাপন করুন
-        // এটি সেই URL যা আপনি Unipile API কল করে (যেমন, Part A, ধাপ ১) পেয়েছেন।
-        const UNIPULE_AUTH_URL = 'https://account.unipile.com/eyJ1cmwiOiJodHRwczovL2FwaTIyLnVuaXBpbGUuY29tOjE1MjI3IiwidG9rZW4iOiJNSHoxUjFvZC5yaEt3MHVRZE9iNjROajkrR0RVV2x0bFZRT3drTjRsb0daOGVMMXI4czRJPSJ9';
+<script>
+    // **গুরুত্বপূর্ণ:** আপনার n8n ওয়েবহুক URL এখানে সেট করুন
+    const N8N_CONNECT_WEBHOOK_URL = 'https://1100-346.n8n1.deltadns.xyz/webhook/linkedin-connect'; 
+    
+    const connectButton = document.getElementById('connectButton');
+    const buttonText = document.getElementById('buttonText');
+    const loader = document.getElementById('loader');
 
-        function startConnection() {
-            // নিশ্চিত করুন যে URL টি খালি নয়
-            if (UNIPULE_AUTH_URL && UNIPULE_AUTH_URL.includes('http')) {
-                // ব্যবহারকারীকে Unipile Auth URL-এ রিডাইরেক্ট করুন
-                window.location.href = UNIPULE_AUTH_URL;
-            } else {
-                alert('ত্রুটি: Unipile Authentication URL সেট করা হয়নি।');
+    async function startConnection() {
+        // বাটন নিষ্ক্রিয় (disable) করুন এবং লোডার দেখান
+        connectButton.disabled = true;
+        buttonText.style.display = 'none';
+        loader.style.display = 'block';
+
+        try {
+            // ১. n8n ওয়েবহুক কল করুন
+            const response = await fetch(N8N_CONNECT_WEBHOOK_URL, {
+                method: 'POST', // যেহেতু এটি একটি ট্রিগার, POST ব্যবহার করা নিরাপদ
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
+
+            // ২. রেসপন্স ডেটা থেকে URL বের করুন
+            const data = await response.json();
+            
+            // ডেটা স্ট্রাকচার: {"object":"HostedAuthUrl","url":"..."}
+            const authUrl = data.url; 
+
+            if (authUrl) {
+                // ৩. ব্যবহারকারীকে Unipile Auth URL-এ রিডাইরেক্ট করুন
+                window.location.href = authUrl;
+            } else {
+                throw new Error('ওয়েবহুক থেকে সঠিক Auth URL পাওয়া যায়নি।');
+            }
+
+        } catch (error) {
+            console.error('Connection Error:', error);
+            alert(`কানেকশন শুরু করা যায়নি। বিস্তারিত: ${error.message}`);
+            
+            // যদি ব্যর্থ হয়, বাটনটি আবার সক্রিয় করুন
+            connectButton.disabled = false;
+            buttonText.style.display = 'block';
+            loader.style.display = 'none';
         }
-    </script>
+    }
+</script>
 
 </body>
-
 </html>

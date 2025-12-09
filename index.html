@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Chatbot Connection</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 450px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #0077b5;
+            /* LinkedIn Blue */
+            margin-bottom: 20px;
+        }
+
+        p {
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        #connectButton {
+            background-color: #0077b5;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        #connectButton:hover {
+            background-color: #005582;
+        }
+
+        .instruction {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #666;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>🤖 আপনার LinkedIn অ্যাকাউন্ট কানেক্ট করুন</h2>
+        <p>
+            আপনার অ্যাকাউন্টে আমাদের AI Chatbot যুক্ত করতে, দয়া করে আপনার LinkedIn অ্যাকাউন্টে লগইন করুন। এটি সম্পূর্ণ
+            সুরক্ষিতভাবে Unipile এর মাধ্যমে হবে।
+        </p>
+
+        <button id="connectButton" onclick="startConnection()">
+            LinkedIn দিয়ে কানেক্ট করুন
+        </button>
+
+        <div class="instruction">
+            <p>সফলভাবে কানেক্ট হওয়ার পরে, আপনাকে স্বয়ংক্রিয়ভাবে LinkedIn-এ ফিরিয়ে আনা হবে।</p>
+        </div>
+    </div>
+
+    <script>
+        // **গুরুত্বপূর্ণ:** আপনার Unipile Hosted Authentication URL এখানে প্রতিস্থাপন করুন
+        // এটি সেই URL যা আপনি Unipile API কল করে (যেমন, Part A, ধাপ ১) পেয়েছেন।
+        const UNIPULE_AUTH_URL = 'https://account.unipile.com/eyJ1cmwiOiJodHRwczovL2FwaTIyLnVuaXBpbGUuY29tOjE1MjI3IiwidG9rZW4iOiJNSHoxUjFvZC5yaEt3MHVRZE9iNjROajkrR0RVV2x0bFZRT3drTjRsb0daOGVMMXI4czRJPSJ9';
+
+        function startConnection() {
+            // নিশ্চিত করুন যে URL টি খালি নয়
+            if (UNIPULE_AUTH_URL && UNIPULE_AUTH_URL.includes('http')) {
+                // ব্যবহারকারীকে Unipile Auth URL-এ রিডাইরেক্ট করুন
+                window.location.href = UNIPULE_AUTH_URL;
+            } else {
+                alert('ত্রুটি: Unipile Authentication URL সেট করা হয়নি।');
+            }
+        }
+    </script>
+
+</body>
+
+</html>
